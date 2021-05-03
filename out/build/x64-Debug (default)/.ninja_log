@@ -1,0 +1,12 @@
+# ninja log v5
+21	996	641723122	CMakeFiles/oop2_ex01.dir/src/Comp.cpp.obj	db0091d14037ed54
+11	1047	641723122	CMakeFiles/oop2_ex01.dir/src/Sin.cpp.obj	6992566aedc484f2
+15	1107	641723122	CMakeFiles/oop2_ex01.dir/src/Add.cpp.obj	38d381cf2d4d7f7c
+33	1116	641723122	CMakeFiles/oop2_ex01.dir/src/Function.cpp.obj	734365c956f15ef7
+7	1120	641723122	CMakeFiles/oop2_ex01.dir/src/Mul.cpp.obj	c550cb9dc3cde536
+1	1163	641723122	CMakeFiles/oop2_ex01.dir/src/Ln.cpp.obj	782211c077e6a62a
+25	1245	641723122	CMakeFiles/oop2_ex01.dir/src/Log.cpp.obj	9dce3401e904eeed
+37	1515	641723122	CMakeFiles/oop2_ex01.dir/src/main.cpp.obj	ac128172ebc0744a
+4	1573	641723122	CMakeFiles/oop2_ex01.dir/src/Poly.cpp.obj	60cbb86ad472ade2
+29	1752	641723122	CMakeFiles/oop2_ex01.dir/src/FunctionCalculator.cpp.obj	e6ac6383208c7be1
+1753	2081	641723123	oop2_ex01.exe	2b63891b26b3914a

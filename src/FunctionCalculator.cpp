@@ -26,8 +26,13 @@ void FunctionCalculator::run()
         m_ostr << '\n';
         printFunctions();
         m_ostr << "Enter command ('help' for the list of available commands): ";
-        const auto action = readAction();
-        runAction(action);
+        try {
+            const auto action = readAction();
+            runAction(action);
+        }
+        catch (std::out_of_range& e) {
+            this->m_ostr << e.what();
+        }
     } while (m_running);
 }
 
@@ -49,7 +54,8 @@ void FunctionCalculator::eval()
 void FunctionCalculator::poly()
 {
     auto n = 0;
-    m_istr >> n;
+
+        m_istr >> n;
     auto coeffs = std::vector<double>(n);
     for (auto& coeff : coeffs)
     {
@@ -106,11 +112,8 @@ std::optional<int> FunctionCalculator::readFunctionIndex() const
 {
     auto i = 0;
     m_istr >> i;
-    if (i >= m_functions.size())
-    {
-        m_ostr << "Function #" << i << " doesn't exist\n";
-        return {};
-    }
+    if (i >= m_functions.size() && i < 0)
+        throw std::out_of_range("\nFunction #" +std::to_string(i) +" doesn't exist\n");
     return i;
 }
 
@@ -126,7 +129,6 @@ FunctionCalculator::Action FunctionCalculator::readAction() const
             return m_actions[i].action;
         }
     }
-
     return Action::Invalid;
 }
 
@@ -135,11 +137,11 @@ void FunctionCalculator::runAction(Action action)
     switch (action)
     {
         default:
-            m_ostr << "Unknown enum entry used!\n";
+            throw std::out_of_range("\nUnknown enum entry used!\n");
             break;
 
         case Action::Invalid:
-            m_ostr << "Command not found\n";
+            throw std::out_of_range("\nCommand not found\n");
             break;
 
         case Action::Eval: eval();             break;
