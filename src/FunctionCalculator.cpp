@@ -12,6 +12,7 @@
 #include <ostream>
 #include <iomanip>
 #include <sstream>
+#include <limits>
 
 FunctionCalculator::FunctionCalculator(std::istream& istr, std::ostream& ostr)
     : m_actions(createActions()), m_functions(createFunctions()), m_istr(istr), m_ostr(ostr)
@@ -32,6 +33,8 @@ void FunctionCalculator::run()
         }
         catch (std::out_of_range& e) {
             this->m_ostr << e.what();
+            m_istr.clear();
+            m_istr.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
     } while (m_running);
 }
@@ -42,6 +45,7 @@ void FunctionCalculator::eval()
     {
         auto x = 0.;
         m_istr >> x;
+
         auto sstr = std::ostringstream();
         sstr << std::setprecision(2) << std::fixed << x;
         m_ostr << m_functions[*i]->to_string(sstr.str())
@@ -56,11 +60,15 @@ void FunctionCalculator::poly()
     auto n = 0;
 
         m_istr >> n;
+        if (n < 0)
+            throw std::out_of_range("\ncoeffient must be positive\n");
+
     auto coeffs = std::vector<double>(n);
     for (auto& coeff : coeffs)
     {
         m_istr >> coeff;
     }
+
     m_functions.push_back(std::make_shared<Poly>(coeffs));
 }
 
@@ -68,6 +76,9 @@ void FunctionCalculator::log()
 {
     auto base = 0;
     m_istr >> base;
+    if (base < 0 || base == 1)
+        throw std::out_of_range("\nBase of log must be positive & differ then 1\n");
+
     if (auto f = readFunctionIndex(); f)
     {
         m_functions.push_back(std::make_shared<Log>(base, m_functions[*f]));
@@ -112,7 +123,7 @@ std::optional<int> FunctionCalculator::readFunctionIndex() const
 {
     auto i = 0;
     m_istr >> i;
-    if (i >= m_functions.size() && i < 0)
+    if (i >= m_functions.size() || i < 0)
         throw std::out_of_range("\nFunction #" +std::to_string(i) +" doesn't exist\n");
     return i;
 }
