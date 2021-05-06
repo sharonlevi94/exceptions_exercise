@@ -5,6 +5,7 @@
 #include <string>
 #include <iosfwd>
 #include <optional>
+#include <fstream>
 
 class Function;
 
@@ -21,6 +22,7 @@ private:
     void del();
     void help();
     void exit();
+    void read();
 
     template <typename FuncType>
     void binaryFunc()
@@ -45,6 +47,8 @@ private:
         Del,
         Help,
         Exit,
+        Read,
+        Resize,
     };
 
     struct ActionDetails
@@ -60,8 +64,10 @@ private:
     const ActionMap m_actions;
     FunctionList m_functions;
     bool m_running = true;
+    bool m_runFile = false;
     std::istream& m_istr;
     std::ostream& m_ostr;
+    std::ifstream* m_ifstr=nullptr;
 
     std::optional<int> readFunctionIndex() const;
     Action readAction() const;

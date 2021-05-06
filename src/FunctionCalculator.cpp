@@ -36,6 +36,7 @@ void FunctionCalculator::run()
             m_istr.clear();
             m_istr.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
+        catch(...){}
     } while (m_running);
 }
 
@@ -109,6 +110,12 @@ void FunctionCalculator::exit()
     m_running = false;
 }
 
+void FunctionCalculator::read(){
+    auto file_name = std::string();
+    m_istr >> file_name;
+
+}
+
 void FunctionCalculator::printFunctions() const
 {
     m_ostr << "List of available gates:\n";
@@ -164,6 +171,7 @@ void FunctionCalculator::runAction(Action action)
         case Action::Del:  del();              break;
         case Action::Help: help();             break;
         case Action::Exit: exit();             break;
+        case Action::Read: read();             break;
     }
 }
 
@@ -218,6 +226,16 @@ FunctionCalculator::ActionMap FunctionCalculator::createActions()
             "exit",
             " - exit the program",
             Action::Exit
+        },
+        {
+            "read",
+            " - read commands from file",
+            Action::Read
+        },
+        {
+            "resize",
+            " - resize the functions list",
+            Action::Resize
         }
     };
 }
@@ -230,3 +248,4 @@ FunctionCalculator::FunctionList FunctionCalculator::createFunctions()
         std::make_shared<Ln>()
     };
 }
+
