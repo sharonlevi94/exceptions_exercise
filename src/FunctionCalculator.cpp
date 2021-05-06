@@ -36,6 +36,7 @@ void FunctionCalculator::run()
 //            continue;
 //        }
         // end of file usage.
+
         m_ostr << '\n';
         printFunctions();
         m_ostr << "Enter command ('help' for the list of available commands): ";
