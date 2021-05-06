@@ -21,6 +21,7 @@ private:
     void del();
     void help();
     void exit();
+    static bool read();
 
     template <typename FuncType>
     void binaryFunc()
@@ -45,6 +46,7 @@ private:
         Del,
         Help,
         Exit,
+        Read
     };
 
     struct ActionDetails
@@ -64,7 +66,7 @@ private:
     std::ostream& m_ostr;
 
     std::optional<int> readFunctionIndex() const;
-    Action readAction() const;
+    Action readAction(const std::string&) const;
     void runAction(Action action);
 
     static ActionMap createActions();
