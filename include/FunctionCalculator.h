@@ -5,6 +5,7 @@
 #include <string>
 #include <iosfwd>
 #include <optional>
+#include <sstream>
 
 class Function;
 
@@ -67,10 +68,10 @@ private:
     std::ostream& m_ostr;
     std::istringstream m_iss;
 
-    std::optional<int> readFunctionIndex() const;
-    Action readAction(const std::string&) const;
+    std::optional<int> readFunctionIndex();
+    Action readAction() ;
     void runAction(Action action);
-    void readArgs(double);
+    double readArgs();
 
     static ActionMap createActions();
     static FunctionList createFunctions();

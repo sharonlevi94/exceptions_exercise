@@ -1,4 +1,4 @@
-#include "FunctionCalculator.h"
+﻿#include "FunctionCalculator.h"
 
 #include "Sin.h"
 #include "Ln.h"
@@ -29,7 +29,7 @@ void FunctionCalculator::run()
         printFunctions();
         m_ostr << "Enter command ('help' for the list of available commands): ";
         try {
-            const auto action = readAction("");
+            const auto action = readAction();
             runAction(action);
         }
         catch (const std::out_of_range& e) {
@@ -48,9 +48,7 @@ void FunctionCalculator::eval()
 {
     if (auto i = readFunctionIndex(); i)
     {
-        auto x = 0.;
-        //m_istr >> x;
-        readArgs(x);
+        auto x = readArgs();
 
         auto sstr = std::ostringstream();
         sstr << std::setprecision(2) << std::fixed << x;
@@ -63,16 +61,15 @@ void FunctionCalculator::eval()
 
 void FunctionCalculator::poly()
 {
-    auto n = 0;
+    auto n = readArgs();
 
-        m_istr >> n;
         if (n < 0)
             throw std::out_of_range("\ncoeffient must be positive\n");
 
     auto coeffs = std::vector<double>(n);
     for (auto& coeff : coeffs)
     {
-        m_istr >> coeff;
+        coeff=readArgs();
     }
 
     m_functions.push_back(std::make_shared<Poly>(coeffs));
@@ -80,9 +77,8 @@ void FunctionCalculator::poly()
 
 void FunctionCalculator::log()
 {
-    auto base = 0; 
-    //m_istr >> base;
-    readArgs(base);
+    int base =readArgs();
+
 
     if (base < 0 || base == 1)
         throw std::out_of_range("\nBase of log must be positive & differ then 1\n");
@@ -138,7 +134,7 @@ bool FunctionCalculator::read()
             m_iss = std::istringstream(lineOfCommand);
             m_iss.exceptions(std::ios::failbit | std::ios::badbit);
             if (!(m_iss.eof() || (m_iss >> std::ws).eof())) {
-                const auto fileAction = readAction(lineOfCommand.substr(0, lineOfCommand.find(' ')));
+                const auto fileAction = readAction();
                 runAction(fileAction);
             }
         }
@@ -146,6 +142,7 @@ bool FunctionCalculator::read()
     inputFile.close();
     this->m_readFile = false;
     return false;
+    //E:\commands.txt
 }
 
 void FunctionCalculator::printFunctions() const
@@ -158,22 +155,21 @@ void FunctionCalculator::printFunctions() const
     m_ostr << '\n';
 }
 
-std::optional<int> FunctionCalculator::readFunctionIndex() const
+std::optional<int> FunctionCalculator::readFunctionIndex() 
 {
-    auto i = 0;
-    //m_istr >> i;
+    int i = readArgs();
+
     if (i >= m_functions.size() || int(i) < 0)
         throw std::out_of_range("\nFunction #" +std::to_string(i) +" doesn't exist\n");
     return i;
 }
 
-FunctionCalculator::Action FunctionCalculator::readAction(const std::string& possibleAction) const
+FunctionCalculator::Action FunctionCalculator::readAction() 
 {
     auto action = std::string();
     // multi purpose this function, to use with file and with std input
-    if (!possibleAction.empty())   
-        action = possibleAction;
-    else    m_istr >> action;
+    if (m_readFile) m_iss >> action;
+    else            m_istr >> action;
 
     for (decltype(m_actions.size()) i = 0; i < m_actions.size(); ++i)
     {
@@ -280,9 +276,12 @@ FunctionCalculator::FunctionList FunctionCalculator::createFunctions()
     };
 }
 
-void FunctionCalculator::readArgs(double x) {
+double FunctionCalculator::readArgs() {
+    auto x = 0;
     if (m_readFile)
         m_iss >> x;
     else
         m_istr >> x;
+
+    return x;
 }
