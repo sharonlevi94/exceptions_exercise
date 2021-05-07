@@ -21,7 +21,7 @@ private:
     void del();
     void help();
     void exit();
-    static bool read();
+    bool read();
 
     template <typename FuncType>
     void binaryFunc()
@@ -62,12 +62,15 @@ private:
     const ActionMap m_actions;
     FunctionList m_functions;
     bool m_running = true;
+    bool m_readFile = false;
     std::istream& m_istr;
     std::ostream& m_ostr;
+    std::istringstream m_iss;
 
     std::optional<int> readFunctionIndex() const;
     Action readAction(const std::string&) const;
     void runAction(Action action);
+    void readArgs(double);
 
     static ActionMap createActions();
     static FunctionList createFunctions();

@@ -1,0 +1,6 @@
+add 0 1
+mul 2 1
+comp 2 3
+poly 2 1 1
+del 2
+eval 3 4

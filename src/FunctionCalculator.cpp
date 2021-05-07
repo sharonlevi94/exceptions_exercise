@@ -17,57 +17,30 @@
 #include <fstream>
 
 FunctionCalculator::FunctionCalculator(std::istream& istr, std::ostream& ostr)
-    : m_actions(createActions()), m_functions(createFunctions()), m_istr(istr), m_ostr(ostr)
-{
-}
+    : m_actions(createActions()), m_functions(createFunctions()), m_istr(istr), m_ostr(ostr){}
 
 void FunctionCalculator::run()
 {
     m_ostr << std::setprecision(2) << std::fixed;
-    // add for file usage
 
-    //bool readingFromInputFile = false;
     do
     {
-        // file:
-//        if (readingFromInputFile){
-//            std::string currInput;
-//
-//            continue;
-//        }
-        // end of file usage.
-
         m_ostr << '\n';
         printFunctions();
         m_ostr << "Enter command ('help' for the list of available commands): ";
         try {
             const auto action = readAction("");
-            if (action == Action::Read) {
-                //readingFromInputFile = true;
-                m_ostr << "Enter file path:\n";
-                std:: string fileName, lineOfCommand;
-                m_istr >> fileName;
-                std::fstream inputFile(fileName);
-                // add except here for file open
-                while (inputFile){
-                    // read line
-                    std::getline(inputFile,lineOfCommand);
-                    // send line to "runAction"
-                    const auto fileAction = readAction(lineOfCommand.substr(0, lineOfCommand.find(' ')));
-                    runAction(fileAction);
-                    ///Users/barifrah/CLionProjects/exceptions_exercise
-                }
-
-                inputFile.close();
-                continue;
-            }
             runAction(action);
         }
-        catch (std::out_of_range& e) {
+        catch (const std::out_of_range& e) {
             this->m_ostr << e.what();
             m_istr.clear();
             m_istr.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
         }
+        catch (const std::ifstream::failure& e) {
+            this->m_ostr << e.what();
+        }
+
     } while (m_running);
 }
 
@@ -76,7 +49,8 @@ void FunctionCalculator::eval()
     if (auto i = readFunctionIndex(); i)
     {
         auto x = 0.;
-        m_istr >> x;
+        //m_istr >> x;
+        readArgs(x);
 
         auto sstr = std::ostringstream();
         sstr << std::setprecision(2) << std::fixed << x;
@@ -106,8 +80,10 @@ void FunctionCalculator::poly()
 
 void FunctionCalculator::log()
 {
-    auto base = 0;
-    m_istr >> base;
+    auto base = 0; 
+    //m_istr >> base;
+    readArgs(base);
+
     if (base < 0 || base == 1)
         throw std::out_of_range("\nBase of log must be positive & differ then 1\n");
 
@@ -145,7 +121,30 @@ void FunctionCalculator::exit()
 // bool - to return if EOF ot not.
 bool FunctionCalculator::read()
 {
-    //
+    //m_ostr << "Enter file path:\n";
+    std::string fileName, lineOfCommand;
+
+    m_istr >> fileName;
+
+        std::fstream inputFile(fileName);
+        // add except here for file open:
+        if (!inputFile)
+            throw std::ifstream::failure("\nWrong file path\n");
+
+    while (inputFile) {
+        this->m_readFile = true;
+        // read line
+        while (std::getline(inputFile, lineOfCommand)) {
+            m_iss = std::istringstream(lineOfCommand);
+            m_iss.exceptions(std::ios::failbit | std::ios::badbit);
+            if (!(m_iss.eof() || (m_iss >> std::ws).eof())) {
+                const auto fileAction = readAction(lineOfCommand.substr(0, lineOfCommand.find(' ')));
+                runAction(fileAction);
+            }
+        }
+    }
+    inputFile.close();
+    this->m_readFile = false;
     return false;
 }
 
@@ -162,8 +161,8 @@ void FunctionCalculator::printFunctions() const
 std::optional<int> FunctionCalculator::readFunctionIndex() const
 {
     auto i = 0;
-    m_istr >> i;
-    if (i >= m_functions.size() || i < 0)
+    //m_istr >> i;
+    if (i >= m_functions.size() || int(i) < 0)
         throw std::out_of_range("\nFunction #" +std::to_string(i) +" doesn't exist\n");
     return i;
 }
@@ -172,7 +171,8 @@ FunctionCalculator::Action FunctionCalculator::readAction(const std::string& pos
 {
     auto action = std::string();
     // multi purpose this function, to use with file and with std input
-    if (!possibleAction.empty())   action = possibleAction;
+    if (!possibleAction.empty())   
+        action = possibleAction;
     else    m_istr >> action;
 
     for (decltype(m_actions.size()) i = 0; i < m_actions.size(); ++i)
@@ -278,4 +278,11 @@ FunctionCalculator::FunctionList FunctionCalculator::createFunctions()
         std::make_shared<Sin>(),
         std::make_shared<Ln>()
     };
+}
+
+void FunctionCalculator::readArgs(double x) {
+    if (m_readFile)
+        m_iss >> x;
+    else
+        m_istr >> x;
 }
