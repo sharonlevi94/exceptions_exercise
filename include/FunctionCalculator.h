@@ -1,4 +1,5 @@
 #pragma once
+#include "Macros.h"
 
 #include <vector>
 #include <memory>
@@ -63,15 +64,17 @@ private:
     const ActionMap m_actions;
     FunctionList m_functions;
     bool m_running = true;
-    bool m_readFile = false;
+    bool m_readFile=false;
     std::istream& m_istr;
     std::ostream& m_ostr;
     std::istringstream m_iss;
+    int m_maxFuncs = MAX_SIZE;
 
     std::optional<int> readFunctionIndex();
     Action readAction() ;
     void runAction(Action action);
     double readArgs();
+    void setMaxSize();
 
     static ActionMap createActions();
     static FunctionList createFunctions();

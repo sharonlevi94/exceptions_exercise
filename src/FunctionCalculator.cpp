@@ -17,11 +17,14 @@
 #include <fstream>
 
 FunctionCalculator::FunctionCalculator(std::istream& istr, std::ostream& ostr)
-    : m_actions(createActions()), m_functions(createFunctions()), m_istr(istr), m_ostr(ostr){}
+    : m_actions(createActions()), 
+    m_functions(createFunctions()), 
+    m_istr(istr), m_ostr(ostr){}
 
 void FunctionCalculator::run()
 {
     m_ostr << std::setprecision(2) << std::fixed;
+    setMaxSize();
 
     do
     {
@@ -120,7 +123,10 @@ bool FunctionCalculator::read()
 {
         std::string fileName, fileCommandLine;
 
-        m_istr >> fileName;
+        if (m_readFile)
+            m_iss >> fileName;
+        else
+            m_istr >> fileName;
 
         std::fstream input_file(fileName);
         // add except here for file open:
@@ -158,6 +164,7 @@ bool FunctionCalculator::read()
     this->m_readFile = false;
     return false;
     //E:\commands.txt
+    //E:\commands1.txt
 }
 
 void FunctionCalculator::printFunctions() const
@@ -299,4 +306,20 @@ double FunctionCalculator::readArgs() {
         m_istr >> x;
 
     return x;
+}
+
+void FunctionCalculator::setMaxSize() {
+    while (true) {
+        m_ostr << "\nEnter max number of functions:\n";
+        try {
+            m_istr >> m_maxFuncs;
+            if (m_maxFuncs >= MIN_SIZE && m_maxFuncs <= MAX_SIZE)
+                break;
+            else
+                throw std::out_of_range("\nThe maximum number of functions must be 2-100\n");
+        }
+        catch (std::out_of_range& e) {
+            m_ostr << e.what();
+        }
+    }
 }
