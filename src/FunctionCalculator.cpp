@@ -33,6 +33,7 @@ void FunctionCalculator::run()
             runAction(action);
         }
         catch (const std::out_of_range& e) {
+       
             this->m_ostr << e.what();
             m_istr.clear();
             m_istr.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
@@ -117,29 +118,43 @@ void FunctionCalculator::exit()
 // bool - to return if EOF ot not.
 bool FunctionCalculator::read()
 {
-    //m_ostr << "Enter file path:\n";
-    std::string fileName, lineOfCommand;
+        std::string fileName, fileCommandLine;
 
-    m_istr >> fileName;
+        m_istr >> fileName;
 
-        std::fstream inputFile(fileName);
+        std::fstream input_file(fileName);
         // add except here for file open:
-        if (!inputFile)
+        if (!input_file)
             throw std::ifstream::failure("\nWrong file path\n");
-
-    while (inputFile) {
+    
+    while (input_file) {
         this->m_readFile = true;
         // read line
-        while (std::getline(inputFile, lineOfCommand)) {
-            m_iss = std::istringstream(lineOfCommand);
+        while (std::getline(input_file, fileCommandLine)) {
+            m_iss = std::istringstream(fileCommandLine);
             m_iss.exceptions(std::ios::failbit | std::ios::badbit);
             if (!(m_iss.eof() || (m_iss >> std::ws).eof())) {
-                const auto fileAction = readAction();
-                runAction(fileAction);
+                try {
+                    const auto fileAction = readAction();
+                    runAction(fileAction);
+                }
+                catch (std::exception& e) {
+                    m_ostr << fileCommandLine + "\n" + e.what() + "\n";
+                    m_ostr << "Keep reading from file?(y/n)\n";
+                    char answer;
+                    m_istr >> answer;
+                    if (answer == 'y')
+                        continue;
+                    else {
+                        input_file.close();
+                        break;
+                    }
+                }
             }
         }
     }
-    inputFile.close();
+    if(input_file.is_open())
+        input_file.close();
     this->m_readFile = false;
     return false;
     //E:\commands.txt
