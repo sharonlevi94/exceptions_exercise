@@ -199,7 +199,7 @@ void FunctionCalculator::resize() {
         m_ostr << "This will cause lost of all out of range data if you choose to proceed\n";
         m_ostr << "Do you with to proceed with the action? This can not be undone (y/n)\n";
         m_istr >> selection;
-        tolower(selection);
+        selection = tolower(selection);
         if (selection == 'y' ){
             for (int i = m_functions.size(); i > newSize ; i--) {
                 m_functions.pop_back();
@@ -399,11 +399,12 @@ void FunctionCalculator::listCapacityHandler(Action action) {
         {
         case Action::Invalid:
             throw std::out_of_range("\nCommand not found\n");
-        case Action::Eval: eval();             break;
-        case Action::Del:  del();              break;
-        case Action::Help: help();             break;
-        case Action::Exit: exit();             break;
-        case Action::Read: read();             break;
+        case Action::Eval:   eval();             break;
+        case Action::Del:    del();              break;
+        case Action::Help:   help();             break;
+        case Action::Exit:   exit();             break;
+        case Action::Read:   read();             break;
+        case Action::Resize: resize();           break;
         default:
             throw std::out_of_range
             ("\nList of functions is full, please delete some to add others...\n");
