@@ -30,7 +30,8 @@ FunctionCalculator::FunctionCalculator(std::istream& istr, std::ostream& ostr)
 void FunctionCalculator::run()
 {
     m_ostr << std::setprecision(2) << std::fixed;
-    setMaxSize();
+    while (!setMaxSize()) 
+        m_ostr << "\nEnter max number of functions:\n";
 
     do
     {
@@ -91,8 +92,6 @@ void FunctionCalculator::poly()
 void FunctionCalculator::log()
 {
     int base =readArgs();
-
-
     if (base < 0 || base == 1)
         throw std::out_of_range("\nBase of log must be positive & differ then 1\n");
 
@@ -126,7 +125,7 @@ void FunctionCalculator::exit()
     m_running = false;
 }
 
-bool FunctionCalculator::read()
+void FunctionCalculator::read()
 {
         std::string fileName, fileCommandLine;
 
@@ -169,9 +168,13 @@ bool FunctionCalculator::read()
     if(input_file.is_open())
         input_file.close();
     this->m_readFile = false;
-    return false;
     //E:\commands.txt
     //E:\commands1.txt
+}
+
+void FunctionCalculator::resize() {
+    auto x = readArgs(); //get new size from the user\file
+
 }
 
 //-----------------------------------------------------------------------------
@@ -232,16 +235,17 @@ void FunctionCalculator::runAction(Action action)
             case Action::Invalid:
                 throw std::out_of_range("\nCommand not found\n");
 
-            case Action::Eval: eval();             break;
-            case Action::Poly: poly();             break;
-            case Action::Mul:  binaryFunc<Mul>();  break;
-            case Action::Add:  binaryFunc<Add>();  break;
-            case Action::Comp: binaryFunc<Comp>(); break;
-            case Action::Log:  log();              break;
-            case Action::Del:  del();              break;
-            case Action::Help: help();             break;
-            case Action::Exit: exit();             break;
-            case Action::Read: read();             break;
+            case Action::Eval:   eval();             break;
+            case Action::Poly:   poly();             break;
+            case Action::Mul:    binaryFunc<Mul>();  break;
+            case Action::Add:    binaryFunc<Add>();  break;
+            case Action::Comp:   binaryFunc<Comp>(); break;
+            case Action::Log:    log();              break;
+            case Action::Del:    del();              break;
+            case Action::Help:   help();             break;
+            case Action::Exit:   exit();             break;
+            case Action::Read:   read();             break;
+            case Action::Resize: resize();           break;
         }
 }
 
@@ -304,6 +308,11 @@ FunctionCalculator::ActionMap FunctionCalculator::createActions()
            "read",
            " - read commands from external file",
            Action::Read
+        },
+        {
+           "resize",
+           " - change the size of the functions list",
+           Action::Resize
         }
     };
 }
@@ -333,20 +342,18 @@ double FunctionCalculator::readArgs() {
 
 //-----------------------------------------------------------------------------
 
-void FunctionCalculator::setMaxSize() {
-    while (true) {
-        m_ostr << "\nEnter max number of functions:\n";
+bool FunctionCalculator::setMaxSize() {    
         try {
             m_istr >> m_maxFuncs;
             if (m_maxFuncs >= MIN_SIZE && m_maxFuncs <= MAX_SIZE)
-                break;
+                return true;
             else
                 throw std::out_of_range("\nThe maximum number of functions must be 2-100\n");
         }
         catch (std::out_of_range& e) {
             m_ostr << e.what();
+            return false;
         }
-    }
 }
 
 //-----------------------------------------------------------------------------

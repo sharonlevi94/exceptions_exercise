@@ -23,7 +23,9 @@ private:
     void del();
     void help();
     void exit();
-    bool read();
+    void read();
+    void resize();
+
 
     template <typename FuncType>
     void binaryFunc()
@@ -48,7 +50,8 @@ private:
         Del,
         Help,
         Exit,
-        Read
+        Read,
+        Resize
     };
 
     struct ActionDetails
@@ -74,7 +77,7 @@ private:
     Action readAction() ;
     void runAction(Action action);
     double readArgs();
-    void setMaxSize();
+    bool setMaxSize();
     void listCapacityHandler(Action action);
 
     static ActionMap createActions();
