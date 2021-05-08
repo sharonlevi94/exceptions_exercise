@@ -16,10 +16,16 @@
 #include <string>
 #include <fstream>
 
+//-----------------------------------------------------------------------------
+//                                Constructor
+
 FunctionCalculator::FunctionCalculator(std::istream& istr, std::ostream& ostr)
     : m_actions(createActions()), 
     m_functions(createFunctions()), 
     m_istr(istr), m_ostr(ostr){}
+
+//-----------------------------------------------------------------------------
+//                              Execute Method
 
 void FunctionCalculator::run()
 {
@@ -47,6 +53,9 @@ void FunctionCalculator::run()
 
     } while (m_running);
 }
+
+//-----------------------------------------------------------------------------
+//                              Commands Methods
 
 void FunctionCalculator::eval()
 {
@@ -117,8 +126,6 @@ void FunctionCalculator::exit()
     m_running = false;
 }
 
-// add "Read" function here:
-// bool - to return if EOF ot not.
 bool FunctionCalculator::read()
 {
         std::string fileName, fileCommandLine;
@@ -167,6 +174,8 @@ bool FunctionCalculator::read()
     //E:\commands1.txt
 }
 
+//-----------------------------------------------------------------------------
+
 void FunctionCalculator::printFunctions() const
 {
     m_ostr << "List of available gates:\n";
@@ -178,6 +187,8 @@ void FunctionCalculator::printFunctions() const
     m_ostr << "You can create " << m_maxFuncs - m_functions.size() << " more funcions\n";
 }
 
+//-----------------------------------------------------------------------------
+
 std::optional<int> FunctionCalculator::readFunctionIndex() 
 {
     int i = readArgs();
@@ -186,6 +197,8 @@ std::optional<int> FunctionCalculator::readFunctionIndex()
         throw std::out_of_range("\nFunction #" +std::to_string(i) +" doesn't exist\n");
     return i;
 }
+
+//-----------------------------------------------------------------------------
 
 FunctionCalculator::Action FunctionCalculator::readAction() 
 {
@@ -204,30 +217,35 @@ FunctionCalculator::Action FunctionCalculator::readAction()
     return Action::Invalid;
 }
 
-//add FILE* here
+//-----------------------------------------------------------------------------
+
 void FunctionCalculator::runAction(Action action)
 {
-    switch (action)
-    {
-        default:
-            throw std::out_of_range("\nUnknown enum entry used!\n");
+    if (m_functions.size() == m_maxFuncs)
+        listCapacityHandler(action);
+    else
+        switch (action)
+        {
+            default:
+                throw std::out_of_range("\nUnknown enum entry used!\n");
 
-        case Action::Invalid:
-            throw std::out_of_range("\nCommand not found\n");
+            case Action::Invalid:
+                throw std::out_of_range("\nCommand not found\n");
 
-        case Action::Eval: eval();             break;
-        case Action::Poly: poly();             break;
-        case Action::Mul:  binaryFunc<Mul>();  break;
-        case Action::Add:  binaryFunc<Add>();  break;
-        case Action::Comp: binaryFunc<Comp>(); break;
-        case Action::Log:  log();              break;
-        case Action::Del:  del();              break;
-        case Action::Help: help();             break;
-        case Action::Exit: exit();             break;
-        // add read:
-        case Action::Read: read();             break;
-    }
+            case Action::Eval: eval();             break;
+            case Action::Poly: poly();             break;
+            case Action::Mul:  binaryFunc<Mul>();  break;
+            case Action::Add:  binaryFunc<Add>();  break;
+            case Action::Comp: binaryFunc<Comp>(); break;
+            case Action::Log:  log();              break;
+            case Action::Del:  del();              break;
+            case Action::Help: help();             break;
+            case Action::Exit: exit();             break;
+            case Action::Read: read();             break;
+        }
 }
+
+//-----------------------------------------------------------------------------
 
 FunctionCalculator::ActionMap FunctionCalculator::createActions()
 {
@@ -290,6 +308,8 @@ FunctionCalculator::ActionMap FunctionCalculator::createActions()
     };
 }
 
+//-----------------------------------------------------------------------------
+
 FunctionCalculator::FunctionList FunctionCalculator::createFunctions()
 {
     return FunctionList
@@ -298,6 +318,8 @@ FunctionCalculator::FunctionList FunctionCalculator::createFunctions()
         std::make_shared<Ln>()
     };
 }
+
+//-----------------------------------------------------------------------------
 
 double FunctionCalculator::readArgs() {
     auto x = 0;
@@ -308,6 +330,8 @@ double FunctionCalculator::readArgs() {
 
     return x;
 }
+
+//-----------------------------------------------------------------------------
 
 void FunctionCalculator::setMaxSize() {
     while (true) {
@@ -323,4 +347,23 @@ void FunctionCalculator::setMaxSize() {
             m_ostr << e.what();
         }
     }
+}
+
+//-----------------------------------------------------------------------------
+/*
+    This method handle in case of full capacity in the list
+*/
+void FunctionCalculator::listCapacityHandler(Action action) {
+        switch (action)
+        {
+        case Action::Invalid:
+            throw std::out_of_range("\nCommand not found\n");
+        case Action::Del:  del();              break;
+        case Action::Help: help();             break;
+        case Action::Exit: exit();             break;
+        case Action::Read: read();             break;
+        default:
+            throw std::out_of_range
+            ("\nList of functions is full, please delete some to add others...\n");
+        }
 }

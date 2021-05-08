@@ -75,6 +75,7 @@ private:
     void runAction(Action action);
     double readArgs();
     void setMaxSize();
+    void listCapacityHandler(Action action);
 
     static ActionMap createActions();
     static FunctionList createFunctions();
