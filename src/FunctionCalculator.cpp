@@ -358,6 +358,7 @@ void FunctionCalculator::listCapacityHandler(Action action) {
         {
         case Action::Invalid:
             throw std::out_of_range("\nCommand not found\n");
+        case Action::Eval: eval();             break;
         case Action::Del:  del();              break;
         case Action::Help: help();             break;
         case Action::Exit: exit();             break;
