@@ -175,6 +175,7 @@ void FunctionCalculator::printFunctions() const
         m_ostr << i << ".\t" << m_functions[i]->to_string("x") << '\n';
     }
     m_ostr << '\n';
+    m_ostr << "You can create " << m_maxFuncs - m_functions.size() << " more funcions\n";
 }
 
 std::optional<int> FunctionCalculator::readFunctionIndex() 
