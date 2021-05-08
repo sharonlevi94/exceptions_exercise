@@ -11,7 +11,6 @@
 #include <istream>
 #include <ostream>
 #include <iomanip>
-#include <sstream>
 #include <limits>
 #include <string>
 #include <fstream>
@@ -30,8 +29,7 @@ FunctionCalculator::FunctionCalculator(std::istream& istr, std::ostream& ostr)
 void FunctionCalculator::run()
 {
     m_ostr << std::setprecision(2) << std::fixed;
-    while (!setMaxSize()) 
-        m_ostr << "\nEnter max number of functions:\n";
+    while (!setMaxSize()) {}
 
     do
     {
@@ -73,6 +71,8 @@ void FunctionCalculator::eval()
     }
 }
 
+//---------------------------------------
+
 void FunctionCalculator::poly()
 {
     auto n = readArgs();
@@ -89,9 +89,11 @@ void FunctionCalculator::poly()
     m_functions.push_back(std::make_shared<Poly>(coeffs));
 }
 
+//---------------------------------------
+
 void FunctionCalculator::log()
 {
-    int base =readArgs();
+    int base = readArgs();
     if (base < 0 || base == 1)
         throw std::out_of_range("\nBase of log must be positive & differ then 1\n");
 
@@ -101,13 +103,20 @@ void FunctionCalculator::log()
     }
 }
 
+//---------------------------------------
+
 void FunctionCalculator::del()
 {
+    if (m_functions.size() == MIN_SIZE)
+        throw std::out_of_range("\nCan't have less than 2 functions\n");
+
     if (auto i = readFunctionIndex(); i)
     {
         m_functions.erase(m_functions.begin() + *i);
     }
 }
+
+//---------------------------------------
 
 void FunctionCalculator::help()
 {
@@ -119,11 +128,15 @@ void FunctionCalculator::help()
     m_ostr << '\n';
 }
 
+//---------------------------------------
+
 void FunctionCalculator::exit()
 {
     m_ostr << "Goodbye!\n";
     m_running = false;
 }
+
+//---------------------------------------
 
 void FunctionCalculator::read()
 {
@@ -172,8 +185,28 @@ void FunctionCalculator::read()
     //E:\commands1.txt
 }
 
+//---------------------------------------
+
 void FunctionCalculator::resize() {
-    auto x = readArgs(); //get new size from the user\file
+    auto newSize = readArgs(); //get new size from the user\file
+    try {
+        if (newSize < m_functions.size())
+            throw std::out_of_range("\nNew size is smaller than current size\n");
+    }
+    catch (std::out_of_range& e) {
+        char selection;
+        m_ostr << e.what() << std::endl;
+        m_ostr << "This will cause lost of all out of range data if you choose to proceed\n";
+        m_ostr << "Do you with to proceed with the action? This can not be undone (y/n)\n";
+        m_istr >> selection;
+        tolower(selection);
+        if (selection == 'y' ){
+            for (int i = m_functions.size(); i > newSize ; i--) {
+                m_functions.pop_back();
+            }
+        } else  return;
+    }
+    m_maxFuncs = newSize;
 
 }
 
@@ -344,6 +377,7 @@ double FunctionCalculator::readArgs() {
 
 bool FunctionCalculator::setMaxSize() {    
         try {
+            m_ostr << "\nEnter max number of functions:\n";
             m_istr >> m_maxFuncs;
             if (m_maxFuncs >= MIN_SIZE && m_maxFuncs <= MAX_SIZE)
                 return true;
