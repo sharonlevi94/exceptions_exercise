@@ -364,13 +364,26 @@ FunctionCalculator::FunctionList FunctionCalculator::createFunctions()
 //-----------------------------------------------------------------------------
 
 double FunctionCalculator::readArgs() {
-    auto x = 0;
+    std::string x;
     if (m_readFile)
         m_iss >> x;
     else
         m_istr >> x;
-
-    return x;
+    bool dotInDouble = false;
+    for (char i : x) {
+        if (!isdigit(i)){
+            // if x is a double and we didnt se a floating point yet
+            if (i == '.' and !dotInDouble) {
+                dotInDouble = true;
+                continue;
+            }
+            //throe exception
+            throw std::invalid_argument("\nNon numerical argument inserted.\n");
+        }
+    }
+    //got here means x is a number
+    // std::stod turns string variable into double
+    return std::stod(x);
 }
 
 //-----------------------------------------------------------------------------
