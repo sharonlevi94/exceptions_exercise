@@ -259,27 +259,54 @@ void FunctionCalculator::runAction(Action action)
 {
     if (m_functions.size() == m_maxFuncs)
         listCapacityHandler(action);
-    else
-        switch (action)
-        {
-            default:
-                throw std::out_of_range("\nUnknown enum entry used!\n");
+    else{
+        try {
+            switch (action) {
+                default:
+                    throw std::out_of_range("\nUnknown enum entry used!\n");
 
-            case Action::Invalid:
-                throw std::out_of_range("\nCommand not found\n");
+                case Action::Invalid:
+                    throw std::out_of_range("\nCommand not found\n");
 
-            case Action::Eval:   eval();             break;
-            case Action::Poly:   poly();             break;
-            case Action::Mul:    binaryFunc<Mul>();  break;
-            case Action::Add:    binaryFunc<Add>();  break;
-            case Action::Comp:   binaryFunc<Comp>(); break;
-            case Action::Log:    log();              break;
-            case Action::Del:    del();              break;
-            case Action::Help:   help();             break;
-            case Action::Exit:   exit();             break;
-            case Action::Read:   read();             break;
-            case Action::Resize: resize();           break;
+                case Action::Eval:
+                    eval();
+                    break;
+                case Action::Poly:
+                    poly();
+                    break;
+                case Action::Mul:
+                    binaryFunc<Mul>();
+                    break;
+                case Action::Add:
+                    binaryFunc<Add>();
+                    break;
+                case Action::Comp:
+                    binaryFunc<Comp>();
+                    break;
+                case Action::Log:
+                    log();
+                    break;
+                case Action::Del:
+                    del();
+                    break;
+                case Action::Help:
+                    help();
+                    break;
+                case Action::Exit:
+                    exit();
+                    break;
+                case Action::Read:
+                    read();
+                    break;
+                case Action::Resize:
+                    resize();
+                    break;
+            }
         }
+        catch(std::invalid_argument e){
+            m_ostr << e.what();
+        }
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -365,15 +392,17 @@ FunctionCalculator::FunctionList FunctionCalculator::createFunctions()
 
 double FunctionCalculator::readArgs() {
     std::string x;
+    int i = 0;
     if (m_readFile)
         m_iss >> x;
     else
         m_istr >> x;
     bool dotInDouble = false;
-    for (char i : x) {
-        if (!isdigit(i)){
+    if (x[0] == '-')    i++;
+    for (; i < x.length() ; i++) {
+        if (!isdigit(x[i])){
             // if x is a double and we didnt se a floating point yet
-            if (i == '.' and !dotInDouble) {
+            if (x[i] == '.' and !dotInDouble) {
                 dotInDouble = true;
                 continue;
             }
