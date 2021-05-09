@@ -68,6 +68,7 @@ private:
     FunctionList m_functions;
     bool m_running = true;
     bool m_readFile=false;
+    bool m_readIndex = false;
     std::istream& m_istr;
     std::ostream& m_ostr;
     std::istringstream m_iss;

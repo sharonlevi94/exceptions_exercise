@@ -239,7 +239,9 @@ void FunctionCalculator::printFunctions() const
 
 std::optional<int> FunctionCalculator::readFunctionIndex() 
 {
+    m_readIndex = true;
     int i = readArgs();
+    m_readIndex = false;
 
     if (i >= m_functions.size() || int(i) < 0)
         throw std::out_of_range("\nFunction #" +std::to_string(i) +" doesn't exist\n");
@@ -411,6 +413,8 @@ double FunctionCalculator::readArgs() {
             // if x is a double and we didnt se a floating point yet
             if (x[i] == '.' and !dotInDouble) {
                 dotInDouble = true;
+                if(m_readIndex)
+                    throw std::invalid_argument("\nFunction index must be integer value.\n");
                 continue;
             }
             //throe exception
