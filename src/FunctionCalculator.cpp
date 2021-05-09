@@ -56,6 +56,11 @@ void FunctionCalculator::run()
         catch (const std::ifstream::failure& e) {
             this->m_ostr << e.what();
         }
+        catch (std::invalid_argument e) {
+            m_ostr << e.what();
+            m_istr.clear();
+            m_istr.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
 
     } while (m_running);
 }
@@ -267,7 +272,6 @@ void FunctionCalculator::runAction(Action action)
     if (m_functions.size() == m_maxFuncs)
         listCapacityHandler(action);
     else{
-        try {
             switch (action) {
                 default:
                     throw std::out_of_range("\nUnknown enum entry used!\n");
@@ -309,10 +313,6 @@ void FunctionCalculator::runAction(Action action)
                     resize();
                     break;
             }
-        }
-        catch(std::invalid_argument e){
-            m_ostr << e.what();
-        }
     }
 }
 
