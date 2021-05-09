@@ -421,14 +421,7 @@ double FunctionCalculator::readArgs() {
     // std::stod turns string variable into double
     return std::stod(x);
 }
-//
-//void checkIfNumber(char myChar){
-//    if (x[i] == '.' and !dotInDouble)
-//        continue;
-//    }
-//    //throe exception
-//    throw std::invalid_argument("\nNon numerical argument inserted.\n");
-//}
+
 //-----------------------------------------------------------------------------
 
 bool FunctionCalculator::setMaxSize() {    
