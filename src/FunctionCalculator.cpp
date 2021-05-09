@@ -29,7 +29,14 @@ FunctionCalculator::FunctionCalculator(std::istream& istr, std::ostream& ostr)
 void FunctionCalculator::run()
 {
     m_ostr << std::setprecision(2) << std::fixed;
-    while (!setMaxSize()) {}
+    while (true) {
+        try {
+            while (!setMaxSize()) {}
+            break;
+        } catch (std::invalid_argument &e) {
+            m_ostr << e.what();
+        }
+    }
 
     do
     {
@@ -414,13 +421,26 @@ double FunctionCalculator::readArgs() {
     // std::stod turns string variable into double
     return std::stod(x);
 }
-
+//
+//void checkIfNumber(char myChar){
+//    if (x[i] == '.' and !dotInDouble)
+//        continue;
+//    }
+//    //throe exception
+//    throw std::invalid_argument("\nNon numerical argument inserted.\n");
+//}
 //-----------------------------------------------------------------------------
 
 bool FunctionCalculator::setMaxSize() {    
         try {
+            std::string possibleInput;
             m_ostr << "\nEnter max number of functions:\n";
-            m_istr >> m_maxFuncs;
+            m_istr >> possibleInput;
+            //m_istr >> m_maxFuncs;
+            for (char i : possibleInput){
+                if (!isdigit(i))    throw std::invalid_argument("Non numerical input.\nPlease try again.\n");
+            }
+            m_maxFuncs = stoi(possibleInput);
             if (m_maxFuncs >= MIN_SIZE && m_maxFuncs <= MAX_SIZE)
                 return true;
             else
